@@ -5,7 +5,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="microsoft.entityframeworkcore" Version="3.1.6" />
+    <PackageReference Include="microsoft.entityframeworkcore" Version="5.0.0-preview.7.20365.15" />
+    <PackageReference Include="microsoft.entityframeworkcore.relational" Version="5.0.0-preview.7.20365.15" />
+    <PackageReference Include="microsoft.entityframeworkcore.sqlserver" Version="3.1.6" />
+    <PackageReference Include="microsoft.entityframeworkcore.tools" Version="5.0.0-preview.7.20365.15">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
 </Project>
