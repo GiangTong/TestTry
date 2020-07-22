@@ -3,3 +3,6 @@
 ################################################################################
 
 /.vs
+/fa.todo/.vs/fa.todo/v16
+/fa.todo/fa.todo.core/obj
+/fa.todo/fa.todo.core/bin/Debug/net5.0
