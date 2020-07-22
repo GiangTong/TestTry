@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using fa.todo.core.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using fa.todo.presentation.Models;
@@ -13,14 +14,18 @@ namespace fa.todo.presentation.Controllers
     {
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        private readonly TodoContext _context;
+
+        public HomeController(ILogger<HomeController> logger, TodoContext context)
         {
             _logger = logger;
+            _context = context;
         }
 
         public IActionResult Index()
         {
-            return View();
+            var categories = _context.Categories.ToList();
+            return View(categories);
         }
 
         public IActionResult Privacy()

@@ -14,13 +14,17 @@ namespace fa.todo.core.Models
         public string Title { get; set; }
 
         [DefaultValue(false)]
+        [Display(Name = "Is Completed")]
         public bool IsCompleted { get; set; }
 
+        [Display(Name = "Created Date")]
         public DateTime CreatedDate { get; set; }
 
+        [Display(Name = "Modified Date")]
         public DateTime ModifiedDate { get; set; }
 
         [ForeignKey("Category")]
+        [Display(Name = "Category")]
         public int CategoryId { get; set; }
 
         public virtual Category Category { get; set; }
