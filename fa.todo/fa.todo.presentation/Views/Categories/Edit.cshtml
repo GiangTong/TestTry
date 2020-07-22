@@ -1,4 +1,4 @@
-﻿@model fa.todo.core.Models.Category
+﻿@model Category
 
 @{
     ViewData["Title"] = "Edit";
@@ -20,13 +20,10 @@
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="button" value="Cancel" class="btn btn-outline-secondary" />
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {
