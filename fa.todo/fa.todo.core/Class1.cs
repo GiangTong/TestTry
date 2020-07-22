@@ -2,8 +2,7 @@
 
 namespace fa.todo.core
 {
-    public class TodoContext
+    public class Class1
     {
-
     }
 }
