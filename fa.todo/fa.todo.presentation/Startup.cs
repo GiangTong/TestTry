@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 using fa.todo.core.Models;
 using fa.todo.core.Repositories;
 using fa.todo.core.Services;
+using fa.todo.presentation.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,6 +42,7 @@ namespace fa.todo.presentation
 
             services.AddScoped<IGenericRepository<Todo>, GenericRepository<Todo>>();
             services.AddScoped<ITodoRepository, TodoRepository>();
+            services.AddRazorPages();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -60,13 +63,20 @@ namespace fa.todo.presentation
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
+                    name: "areas",
+                    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
+                );
+                endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+                endpoints.MapRazorPages();
             });
 
             DbInitializer.Seed(context);

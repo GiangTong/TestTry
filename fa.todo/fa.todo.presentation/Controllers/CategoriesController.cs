@@ -24,11 +24,14 @@ namespace fa.todo.presentation.Controllers
 
         // GET: Categories
         [HttpGet]
-        public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageIndex = 1, int pageSize = 10)
+        public async Task<IActionResult> Index(string sortOrder, string currentFilter, 
+            string searchString, int? pageIndex = 1, int pageSize = 10)
         {
             ViewData["CurrentPageSize"] = pageSize;
             ViewData["CurrentSort"] = sortOrder;
             ViewData["NameSortParm"] = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            ViewData["TotalSortParm"] = sortOrder == "Total" ? "total_desc" : "Total";
+
             if (searchString != null)
             {
                 pageIndex = 1;
@@ -54,12 +57,18 @@ namespace fa.todo.presentation.Controllers
                 case "name_desc":
                     orderBy = q => q.OrderByDescending(c => c.Name);
                     break;
+                case "Total":
+                    orderBy = q => q.OrderBy(c => c.Todos.Count);
+                    break;
+                case "total_desc":
+                    orderBy = q => q.OrderByDescending(c => c.Todos.Count);
+                    break;
                 default:
                     orderBy = q => q.OrderBy(c => c.Name);
                     break;
             }
 
-            var categories = await _categoryServices.GetAsync(filter: filter, orderBy: orderBy, pageIndex: pageIndex ?? 1, pageSize: pageSize);
+            var categories = await _categoryServices.GetAsync(filter: filter, orderBy: orderBy, pageIndex: pageIndex ?? 1, pageSize: pageSize, includeProperties:"Todos");
 
             return View(categories);
         }
