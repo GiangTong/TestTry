@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using fa.todo.core.Models;
 using fa.todo.core.Repositories;
+using fa.todo.core.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -33,6 +34,10 @@ namespace fa.todo.presentation
 
             services.AddScoped<IGenericRepository<Category>, GenericRepository<Category>>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
+            
+            services.AddScoped<IBaseService<Category>, BaseService<Category>>();
+            services.AddScoped<ICategoryServices, CategoryServices>();
+
             services.AddScoped<IGenericRepository<Todo>, GenericRepository<Todo>>();
             services.AddScoped<ITodoRepository, TodoRepository>();
         }

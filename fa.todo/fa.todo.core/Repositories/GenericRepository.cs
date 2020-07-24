@@ -1,7 +1,9 @@
-﻿using fa.todo.core.Models;
+﻿using System;
+using fa.todo.core.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace fa.todo.core.Repositories
@@ -70,6 +72,29 @@ namespace fa.todo.core.Repositories
         {
             _dbSet.Remove(entity);
             return await Context.SaveChangesAsync() > 0;
+        }
+
+        // Expression<Func<TEntity, bool>> filter ~ x => x.Name.Contains(searchString)
+        // Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy ~ q => q.OrderByDescending(c => c.Title);
+        public IQueryable<TEntity> Get(Expression<Func<TEntity, bool>> filter = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            string includeProperties = "")
+        {
+            IQueryable<TEntity> query = _dbSet;
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            foreach (var includeProperty in
+                includeProperties.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                query = query.Include(includeProperty);
+            }
+
+            // orderBy ~ q => q.OrderByDescending(c => c.Title)
+            return orderBy != null ? orderBy(query) : query;
         }
     }
 }

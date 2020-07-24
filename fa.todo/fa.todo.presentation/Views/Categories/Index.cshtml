@@ -1,39 +1,132 @@
-﻿@model IEnumerable<Category>
+﻿@model fa.todo.core.Services.Paginated<Category>
 
 @{
     ViewData["Title"] = "Category Management";
 }
 
-<p>
-    <button class="btn btn-info" asp-action="Create"><i class="fas fa-plus-square"></i></button>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Id)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>Manage</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Id)
-                </td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.Id">@item.Name</a>
-                </td>
-                <td>
-                    <a class="btn btn-primary" asp-action="Edit" asp-route-id="@item.Id"><i class="fas fa-edit"></i></a>
-                    <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.Id"><i class="fas fa-trash-alt"></i></a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+    <div class="container-fluid">
+        <h3>Category Management</h3>
+        <hr />
+        <section>
+            <div class="heading mt-2 mb-2">
+                <form asp-action="Index" asp-controller="Categories" asp-area="" method="get" class="form-inline">
+                    <div class="form-group mr-2">
+                        <a asp-action="Create" asp-controller="Categories" asp-area="" class="btn btn-primary bg-custom"><i class="fas fa-plus-square"></i> Category</a>
+                    </div>
+                    <div class="form-group ml-auto d-flex">
+                        <select name="pageSize" id="page-size" class="custom-select mr-2">
+                            <option value="2">2</option>
+                            <option value="10">10</option>
+                            <option value="15">15</option>
+                            <option value="20">20</option>
+                            <option value="30">30</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                        <input type="text" class="form-control mr-2" id="inputSearch" name="searchString"
+                               value="@ViewData["CurrentFilter"]" placeholder="Search Category....">
+                        <button type="submit" class=" form-control btn btn-primary bg-custom mr-2">
+                            <i class="fas fa-search"></i>
+                        </button>
+                        <a asp-action="Index" asp-controller="Categories" asp-area="" class="btn btn-secondary">
+                            <i class="fas fa-undo"></i>
+                        </a>
+                    </div>
+                </form>
+            </div>
+            <div class="category-list">
+                <table class="table table-bordered">
+                    <thead class="bg-custom rounded">
+                        <tr>
+                            <th scope="col">
+                                <a asp-action="Index" asp-controller="Categories" asp-area="" asp-route-sortOrder="@ViewData["NameSortParm"]"
+                                   asp-route-currentFilter="@ViewData["CurrentFilter"]" asp-route-pageSize="@ViewData["CurrentPageSize"]">
+                                    Category Name
+                                </a>
+                            </th>
+                            <th scope="col">Manage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var category in Model)
+                        {
+                            <tr>
+                                <td scope="row">
+                                    <a asp-action="Edit" asp-controller="Categories" asp-area=""
+                                       asp-route-id="@category.Id">@category.Name</a>
+                                </td>
+                                <td>
+                                    <form asp-action="Delete" asp-controller="Categories" asp-area="" asp-route-id="@category.Id">
+                                        <a asp-action="Edit" asp-controller="Categories" asp-area=""
+                                           asp-route-id="@category.Id" class="btn btn-primary bg-custom">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="submit"
+                                                onclick="return confirm('Are you sure to delete this category?');"
+                                                class="btn btn-danger ">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @{
+                var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+                var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+                ViewBag.PageRange = 3;
+            }
+            <div class="paging mb-3">
+                <nav aria-label="page-navigation">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item">
+                            <a asp-action="Index" asp-controller="Categories" asp-area=""
+                               asp-route-sortOrder="@ViewData["CurrentSort"]" asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                               asp-route-pageIndex="1" asp-route-pageSize="@ViewData["CurrentPageSize"]" class="btn page-link @prevDisabled">
+                                <i class="fas fa-fast-backward"></i>
+                            </a>
+                        <li class="page-item">
+                            <a asp-action="Index" asp-controller="Categories" asp-area=""
+                               asp-route-sortOrder="@ViewData["CurrentSort"]" asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                               asp-route-pageIndex="@(Model.PageIndex - 1 <= 0 ? 1 : Model.PageIndex - 1)" asp-route-pageSize="@ViewData["CurrentPageSize"]"
+                               class="btn page-link @prevDisabled">
+                                <i class="fas fa-backward"></i>
+                            </a>
+                        </li>
+
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            if (i >= Model.PageIndex - ViewBag.PageRange && i <= Model.PageIndex + ViewBag.PageRange)
+                            {
+                                <li class="page-item">
+                                    <a asp-action="Index" asp-controller="Categories" asp-area=""
+                                       asp-route-sortOrder="@ViewData["CurrentSort"]" asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                                       asp-route-pageIndex="@i" asp-route-pageSize="@ViewData["CurrentPageSize"]"
+                                       class="btn page-link @(i==Model.PageIndex ? "current" : "")">
+                                        @i
+                                    </a>
+                                </li>
+                            }
+                        }
+                        <li class="page-item">
+                            <a asp-action="Index" asp-controller="Categories" asp-area=""
+                               asp-route-sortOrder="@ViewData["CurrentSort"]" asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                               asp-route-pageIndex="@(Model.PageIndex + 1 > Model.TotalPages ? Model.TotalPages : Model.PageIndex + 1)"
+                               asp-route-pageSize="@ViewData["CurrentPageSize"]" class="btn page-link @nextDisabled">
+                                <i class="fas fa-forward"></i>
+                            </a>
+                        <li class="page-item">
+                            <a asp-action="Index" asp-controller="Categories" asp-area="" asp-route-sortOrder="@ViewData["CurrentSort"]"
+                               asp-route-currentFilter="@ViewData["CurrentFilter"]" asp-route-pageIndex="@(Model.PageIndex)"
+                               asp-route-pageSize="@ViewData["CurrentPageSize"]" class="btn page-link @nextDisabled">
+                                <i class="fas fa-fast-forward"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </section>
+    </div>
