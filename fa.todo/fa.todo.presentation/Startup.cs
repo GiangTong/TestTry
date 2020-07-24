@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using fa.todo.core.Models;
+using fa.todo.core.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -29,6 +30,11 @@ namespace fa.todo.presentation
                 options.UseSqlServer(Configuration.GetConnectionString("TodoConn")));
 
             services.AddControllersWithViews();
+
+            services.AddScoped<IGenericRepository<Category>, GenericRepository<Category>>();
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<IGenericRepository<Todo>, GenericRepository<Todo>>();
+            services.AddScoped<ITodoRepository, TodoRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

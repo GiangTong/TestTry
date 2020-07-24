@@ -6,23 +6,25 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using fa.todo.core.Models;
+using fa.todo.core.Repositories;
+using SQLitePCL;
 
 namespace fa.todo.presentation.Controllers
 {
     public class CategoriesController : Controller
     {
-        private readonly TodoContext _context;
+        private readonly ICategoryRepository _categoryRepository;
 
-        public CategoriesController(TodoContext context)
+        public CategoriesController(ICategoryRepository categoryRepository)
         {
-            _context = context;
+            _categoryRepository = categoryRepository;
         }
 
         // GET: Categories
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Categories.ToListAsync());
+            return View(await _categoryRepository.GetAllAsync());
         }
 
         // GET: Categories/Details/5
@@ -34,8 +36,7 @@ namespace fa.todo.presentation.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var category = await _categoryRepository.GetByIdAsync((int)id);
             if (category == null)
             {
                 return NotFound();
@@ -60,8 +61,7 @@ namespace fa.todo.presentation.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(category);
-                await _context.SaveChangesAsync();
+                await _categoryRepository.CreateAsync(category);
                 return RedirectToAction(nameof(Index));
             }
             return View(category);
@@ -75,7 +75,7 @@ namespace fa.todo.presentation.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories.FindAsync(id);
+            var category = await _categoryRepository.GetByIdAsync((int)id);
             if (category == null)
             {
                 return NotFound();
@@ -99,12 +99,11 @@ namespace fa.todo.presentation.Controllers
             {
                 try
                 {
-                    _context.Update(category);
-                    await _context.SaveChangesAsync();
+                    await _categoryRepository.UpdateAsync(category);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CategoryExists(category.Id))
+                    if (!await _categoryRepository.ExistAsync(category.Id))
                     {
                         return NotFound();
                     }
@@ -126,8 +125,7 @@ namespace fa.todo.presentation.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var category = await _categoryRepository.GetByIdAsync((int)id);
             if (category == null)
             {
                 return NotFound();
@@ -141,15 +139,9 @@ namespace fa.todo.presentation.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
-            _context.Categories.Remove(category);
-            await _context.SaveChangesAsync();
+            var category = await _categoryRepository.GetByIdAsync(id);
+            await _categoryRepository.DeleteAsync(category);
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool CategoryExists(int id)
-        {
-            return _context.Categories.Any(e => e.Id == id);
         }
     }
 }
